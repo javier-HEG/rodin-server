@@ -9,30 +9,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author rodin
  */
 @Entity
-@Table(name = "UNIVERSES")
-public class UniverseEntity implements Serializable {
+@XmlRootElement
+@Table(name = "USERGROUPS")
+public class UserGroupEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	private Integer id;
 	private String name;
-	@ManyToOne
-	private UserEntity owner;
 
-	public Long getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -42,14 +41,6 @@ public class UniverseEntity implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public UserEntity getOwner() {
-		return owner;
-	}
-
-	public void setOwner(UserEntity owner) {
-		this.owner = owner;
 	}
 
 	@Override
@@ -62,10 +53,10 @@ public class UniverseEntity implements Serializable {
 	@Override
 	public boolean equals(Object object) {
 		// TODO: Warning - this method won't work in the case the id fields are not set
-		if (!(object instanceof UniverseEntity)) {
+		if (!(object instanceof UserGroupEntity)) {
 			return false;
 		}
-		UniverseEntity other = (UniverseEntity) object;
+		UserGroupEntity other = (UserGroupEntity) object;
 		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 			return false;
 		}
@@ -74,6 +65,6 @@ public class UniverseEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "entities.Universe[ id=" + id + " ]";
+		return "model.user.UserGroupEntity[ id=" + id + " ]";
 	}
 }

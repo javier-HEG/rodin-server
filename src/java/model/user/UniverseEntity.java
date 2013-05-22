@@ -11,13 +11,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author rodin
+ * @author Javier Belmonte
  */
 @Entity
 @Table(name = "UNIVERSES")
+@XmlRootElement
 public class UniverseEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -61,7 +63,6 @@ public class UniverseEntity implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
 		if (!(object instanceof UniverseEntity)) {
 			return false;
 		}

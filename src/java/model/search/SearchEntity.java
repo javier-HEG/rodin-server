@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package model.search;
 
 import java.io.Serializable;
@@ -9,14 +5,19 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
+import model.search.AbstractSearch.SearchStatus;
+import model.user.UniverseEntity;
 
 /**
  *
- * @author rodin
+ * @author Javier Belmonte
  */
 @Entity
 @Table(name = "SEARCHES")
+@XmlRootElement
 public class SearchEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -25,9 +26,44 @@ public class SearchEntity implements Serializable {
 	private Long id;
 	private String query;
 	private SearchType type;
+	private SearchStatus status;
+	@ManyToOne
+	private UniverseEntity universe;
+
+	public UniverseEntity getUniverse() {
+		return universe;
+	}
+
+	public void setUniverse(UniverseEntity universe) {
+		this.universe = universe;
+	}
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
+	public SearchType getType() {
+		return type;
+	}
+
+	public void setType(SearchType type) {
+		this.type = type;
+	}
+
+	public SearchStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SearchStatus status) {
+		this.status = status;
 	}
 
 	public void setId(Long id) {
@@ -43,7 +79,6 @@ public class SearchEntity implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are not set
 		if (!(object instanceof SearchEntity)) {
 			return false;
 		}

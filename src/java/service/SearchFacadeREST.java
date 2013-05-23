@@ -21,7 +21,7 @@ import model.search.SearchEntity;
  * @author Javier Belmonte
  */
 @Stateless
-@EJB(beanInterface = AbstractFacade.class, name = "searchFacadeREST")
+@EJB(beanInterface = AbstractFacade.class, name = "SearchFacadeREST")
 @Path("search")
 public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 

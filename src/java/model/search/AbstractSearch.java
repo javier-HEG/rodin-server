@@ -1,14 +1,11 @@
 package model.search;
 
-import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import service.ResultFacadeREST;
 import service.SearchFacadeREST;
 
 /**
@@ -18,6 +15,7 @@ import service.SearchFacadeREST;
 public abstract class AbstractSearch {
 
 	private SearchFacadeREST searchFacadeREST = lookupSearchFacadeRESTBean();
+	protected ResultFacadeREST resultFacadeREST = lookupResultFacadeRESTBean();
 	private Long entityId;
 
 	public void init(Long entityId) {
@@ -34,6 +32,10 @@ public abstract class AbstractSearch {
 
 	protected abstract void executeSearch();
 
+	protected SearchEntity getEntity() {
+		return searchFacadeREST.find(entityId);
+	}
+
 	protected void setStatus(SearchStatus newStatus) {
 		SearchEntity entity = searchFacadeREST.find(entityId);
 		entity.setStatus(newStatus);
@@ -45,6 +47,16 @@ public abstract class AbstractSearch {
 		try {
 			Context c = new InitialContext();
 			return (SearchFacadeREST) c.lookup("java:global/RODIN_Server/SearchFacadeREST!service.SearchFacadeREST");
+		} catch (NamingException ne) {
+			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+			throw new RuntimeException(ne);
+		}
+	}
+
+	private ResultFacadeREST lookupResultFacadeRESTBean() {
+		try {
+			Context c = new InitialContext();
+			return (ResultFacadeREST) c.lookup("java:global/RODIN_Server/ResultFacadeREST!service.ResultFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);

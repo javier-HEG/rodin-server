@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -28,6 +29,7 @@ public class SearchEntity implements Serializable {
 	private SearchType type;
 	private SearchStatus status;
 	@ManyToOne
+	@JoinColumn(nullable = false)
 	private UniverseEntity universe;
 
 	public UniverseEntity getUniverse() {

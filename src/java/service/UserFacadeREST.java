@@ -4,6 +4,7 @@
  */
 package service;
 
+import java.net.URI;
 import java.util.List;
 import model.user.UserEntity;
 import javax.ejb.Stateless;
@@ -18,6 +19,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import model.user.UserGroupEntity;
 
 /**
@@ -36,9 +40,8 @@ public class UserFacadeREST extends AbstractFacade<UserEntity> {
 	}
 
 	@POST
-	@Override
 	@Consumes({"application/xml", "application/json"})
-	public void create(UserEntity entity) {
+	public Response create(UserEntity entity, @Context UriInfo uriInfo) {
 		if (entity.getUsergroup() == null) {
 			Query query = em.createQuery("select g from UserGroupEntity g where g.id='1'");
 
@@ -48,6 +51,9 @@ public class UserFacadeREST extends AbstractFacade<UserEntity> {
 		}
 
 		super.create(entity);
+
+		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getUsername()).build();
+		return Response.created(uri).build(); //@Context UriInfo uriInfo
 	}
 
 	@PUT

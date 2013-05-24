@@ -1,5 +1,6 @@
 package service;
 
+import java.net.URI;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -12,6 +13,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import model.user.UniverseEntity;
 
 /**
@@ -30,10 +34,11 @@ public class UniverseFacadeREST extends AbstractFacade<UniverseEntity> {
 	}
 
 	@POST
-	@Override
 	@Consumes({"application/xml", "application/json"})
-	public void create(UniverseEntity entity) {
+	public Response create(UniverseEntity entity, @Context UriInfo uriInfo) {
 		super.create(entity);
+		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getId().toString()).build();
+		return Response.created(uri).build();
 	}
 
 	@PUT
@@ -45,14 +50,14 @@ public class UniverseFacadeREST extends AbstractFacade<UniverseEntity> {
 
 	@DELETE
 	@Path("{id}")
-	public void remove(@PathParam("id") Integer id) {
+	public void remove(@PathParam("id") Long id) {
 		super.remove(super.find(id));
 	}
 
 	@GET
 	@Path("{id}")
 	@Produces({"application/xml", "application/json"})
-	public UniverseEntity find(@PathParam("id") Integer id) {
+	public UniverseEntity find(@PathParam("id") Long id) {
 		return super.find(id);
 	}
 

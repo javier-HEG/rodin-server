@@ -1,6 +1,7 @@
 package service;
 
 import control.SearchExecuter;
+import java.net.URI;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -13,6 +14,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import model.search.AbstractSearch;
 import model.search.SearchEntity;
 
@@ -33,9 +37,8 @@ public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 	}
 
 	@POST
-	@Override
 	@Consumes({"application/xml", "application/json"})
-	public void create(SearchEntity entity) {
+	public Response create(SearchEntity entity, @Context UriInfo uriInfo) {
 		if (entity.getType() == null) {
 			entity.setType(SearchEntity.SearchType.GLOBAL);
 		}
@@ -48,6 +51,9 @@ public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 
 		SearchExecuter executer = new SearchExecuter(entity.getId());
 		executer.launch();
+
+		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getId().toString()).build();
+		return Response.created(uri).build();
 	}
 
 	@PUT

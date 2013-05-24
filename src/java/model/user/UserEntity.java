@@ -44,8 +44,8 @@ public class UserEntity implements Serializable {
 		return usergroup;
 	}
 
-	public void setUsername(String id) {
-		this.username = id;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public void setPassword(String password) {

@@ -10,9 +10,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 import model.search.AbstractSearch.SearchStatus;
+import model.search.sources.SourceInstanceEntity;
 import model.user.UniverseEntity;
 
 /**
+ * Search. It should be noted that source information will only be used when it
+ * makes sense, most of the time is should remain null.
  *
  * @author Javier Belmonte
  */
@@ -29,8 +32,11 @@ public class SearchEntity implements Serializable {
 	private SearchType type;
 	private SearchStatus status;
 	@ManyToOne
-	@JoinColumn(nullable = false)
+	@JoinColumn(nullable = false, updatable = false, insertable = false)
 	private UniverseEntity universe;
+	@ManyToOne
+	@JoinColumn(updatable = false, insertable = false)
+	private SourceInstanceEntity source;
 
 	public UniverseEntity getUniverse() {
 		return universe;
@@ -62,6 +68,14 @@ public class SearchEntity implements Serializable {
 
 	public SearchStatus getStatus() {
 		return status;
+	}
+
+	public SourceInstanceEntity getSource() {
+		return source;
+	}
+
+	public void setSource(SourceInstanceEntity source) {
+		this.source = source;
 	}
 
 	public void setStatus(SearchStatus status) {

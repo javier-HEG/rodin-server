@@ -1,7 +1,6 @@
 package model.search.sources;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,20 +26,26 @@ public class SourceInstanceEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String id;
-	@Id
+	private Long id;
+	private String sourceName;
 	@ManyToOne
 	private UniverseEntity universe;
-	@Id
 	private AbstractSource.SourceType type;
-//	private HashMap<String, String> configuration;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getSourceName() {
+		return sourceName;
+	}
+
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
 	}
 
 	public UniverseEntity getUniverse() {
@@ -59,13 +64,6 @@ public class SourceInstanceEntity implements Serializable {
 		this.type = type;
 	}
 
-//	public HashMap<String, String> getConfiguration() {
-//		return configuration;
-//	}
-//
-//	public void setConfiguration(HashMap<String, String> configuration) {
-//		this.configuration = configuration;
-//	}
 	@Override
 	public int hashCode() {
 		int hash = 0;

@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author rodin
  */
 @Entity
-@XmlRootElement
+@XmlRootElement(name = "usergroup")
 @Table(name = "USERGROUPS")
 public class UserGroupEntity implements Serializable {
 

@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @Entity
 @Table(name = "UNIVERSES")
-@XmlRootElement
+@XmlRootElement(name = "universe")
 public class UniverseEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;

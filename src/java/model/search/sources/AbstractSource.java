@@ -1,31 +1,47 @@
 package model.search.sources;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  *
  * @author Javier Belmonte
  */
-public abstract class AbstractSource {
+public abstract class AbstractSource implements Serializable {
 
-	public String getId() {
-		return this.getClass().getName();
+	private String name;
+	private SourceStatus status;
+
+	protected AbstractSource() {
+		name = "Default";
+		status = SourceStatus.IDLE;
 	}
 
-	/**
-	 * Sources should override this method to be disabled and so no longer be
-	 * used by anyone
-	 *
-	 * @return
-	 */
-	public boolean isEnabled() {
-		return true;
+	public String getName() {
+		return name;
 	}
 
-	public abstract HashMap<String, String> getDefaultConfiguration();
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public SourceStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SourceStatus status) {
+		this.status = status;
+	}
+
+	public abstract HashMap<String, String> getParameterDescription();
 
 	public enum SourceType {
 
 		DOCUMENT, THESAURUS, LOD
+	}
+
+	public enum SourceStatus {
+
+		IDLE, ACTIVE, ERROR
 	}
 }

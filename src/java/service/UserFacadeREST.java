@@ -53,7 +53,7 @@ public class UserFacadeREST extends AbstractFacade<UserEntity> {
 		super.create(entity);
 
 		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getUsername()).build();
-		return Response.created(uri).build(); //@Context UriInfo uriInfo
+		return Response.created(uri).build();
 	}
 
 	@PUT

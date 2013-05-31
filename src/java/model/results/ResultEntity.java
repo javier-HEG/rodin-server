@@ -1,6 +1,7 @@
 package model.results;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -9,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -40,6 +42,14 @@ public class ResultEntity implements Serializable {
 	private List<String> keywords;
 	private String review;
 	private String doi;
+	// Document sources
+	@OneToMany
+	private List<SourceDocumentEntity> documents;
+
+	public ResultEntity() {
+		authors = new ArrayList<String>();
+		documents = new ArrayList<SourceDocumentEntity>();
+	}
 
 	public Long getId() {
 		return id;
@@ -59,6 +69,10 @@ public class ResultEntity implements Serializable {
 
 	public List<String> getAuthors() {
 		return authors;
+	}
+
+	public void addAuthor(String author) {
+		authors.add(author);
 	}
 
 	public void setAuthors(List<String> authors) {
@@ -119,6 +133,18 @@ public class ResultEntity implements Serializable {
 
 	public void setSearch(SearchEntity search) {
 		this.search = search;
+	}
+
+	public List<SourceDocumentEntity> getDocuments() {
+		return documents;
+	}
+
+	public void addDocument(SourceDocumentEntity document) {
+		documents.add(document);
+	}
+
+	public void setDocuments(List<SourceDocumentEntity> documents) {
+		this.documents = documents;
 	}
 
 	@Override

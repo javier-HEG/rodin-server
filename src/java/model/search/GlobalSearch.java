@@ -1,7 +1,7 @@
 package model.search;
 
-import java.util.ArrayList;
 import model.results.ResultEntity;
+import model.results.SourceDocumentEntity;
 
 /**
  *
@@ -13,13 +13,17 @@ public class GlobalSearch extends AbstractSearch {
 	protected void executeSearch() {
 		// TODO Implement the real search
 		ResultEntity firstResult = new ResultEntity();
-		firstResult.setSearch(getEntity());
+		firstResult.setSearch(getSearchEntity());
+		firstResult.setTitle("Queueing Theoretic Approaches to Financial Price Fluctuations");
+		firstResult.addAuthor("Erhan Bayraktar");
+		firstResult.addAuthor("Ulrich Horst");
+		firstResult.addAuthor("Ronnie Sircar");
 
-		firstResult.setTitle("A first result");
+		SourceDocumentEntity document = new SourceDocumentEntity();
+		document.setSourceLinkURL("http://arxiv.org/abs/math/0703832");
+		documentFacadeREST.create(document);
 
-		ArrayList<String> authors = new ArrayList<String>();
-		authors.add("Javier Belmonte");
-		firstResult.setAuthors(authors);
+		firstResult.addDocument(document);
 
 		resultFacadeREST.create(firstResult);
 	}

@@ -1,36 +1,28 @@
-package model.search.sources;
+package model.results;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import model.user.UniverseEntity;
 
 /**
- * Represents sources instances in use. They would therefore belong to a single
- * universe. However, because there is the possibility that one be used in
- * multiple ways (e.g. as document and LOD source), their configuration
- * parameters need to be one per actual use.
  *
  * @author Javier Belmonte
  */
 @Entity
-@Table(name = "SOURCES")
-@XmlRootElement(name = "sourceInstance")
-public class SourceInstanceEntity implements Serializable {
+@XmlRootElement(name = "document")
+@Table(name = "DOCUMENTS")
+public class SourceDocumentEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String sourceName;
-	@ManyToOne
-	private UniverseEntity universe;
-	private AbstractSource.SourceType type;
+	private String sourceLinkURL;
 
 	public Long getId() {
 		return id;
@@ -48,20 +40,12 @@ public class SourceInstanceEntity implements Serializable {
 		this.sourceName = sourceName;
 	}
 
-	public UniverseEntity getUniverse() {
-		return universe;
+	public String getSourceLinkURL() {
+		return sourceLinkURL;
 	}
 
-	public void setUniverse(UniverseEntity universe) {
-		this.universe = universe;
-	}
-
-	public AbstractSource.SourceType getType() {
-		return type;
-	}
-
-	public void setType(AbstractSource.SourceType type) {
-		this.type = type;
+	public void setSourceLinkURL(String sourceLinkURL) {
+		this.sourceLinkURL = sourceLinkURL;
 	}
 
 	@Override
@@ -73,10 +57,11 @@ public class SourceInstanceEntity implements Serializable {
 
 	@Override
 	public boolean equals(Object object) {
-		if (!(object instanceof SourceInstanceEntity)) {
+		// TODO: Warning - this method won't work in the case the id fields are not set
+		if (!(object instanceof SourceDocumentEntity)) {
 			return false;
 		}
-		SourceInstanceEntity other = (SourceInstanceEntity) object;
+		SourceDocumentEntity other = (SourceDocumentEntity) object;
 		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 			return false;
 		}
@@ -85,6 +70,6 @@ public class SourceInstanceEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "model.search.sources.SourceInstanceEntity[ id=" + id + " ]";
+		return "model.results.SourceDocumentEntity[ id=" + id + " ]";
 	}
 }

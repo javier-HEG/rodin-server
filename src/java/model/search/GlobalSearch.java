@@ -24,7 +24,19 @@ public class GlobalSearch extends AbstractSearch {
 		documentFacadeREST.create(document);
 
 		firstResult.addDocument(document);
-
 		resultFacadeREST.create(firstResult);
+
+		ResultEntity secondResult = new ResultEntity();
+		firstResult.setSearch(getSearchEntity());
+		firstResult.setTitle("A Stochastic Feedback Model for Volatility");
+		firstResult.addAuthor("Raoul Golan");
+		firstResult.addAuthor("Austin Gerig");
+
+		SourceDocumentEntity anotherDocument = new SourceDocumentEntity();
+		document.setSourceLinkURL("http://arxiv.org/abs/1306.4975");
+		documentFacadeREST.create(anotherDocument);
+
+		secondResult.addDocument(anotherDocument);
+		resultFacadeREST.create(secondResult);
 	}
 }

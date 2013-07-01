@@ -5,11 +5,14 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import model.results.ResultEntity;
+import model.search.SearchEntity;
 
 /**
  *
@@ -32,6 +35,18 @@ public class ResultFacadeREST extends AbstractFacade<ResultEntity> {
 	@Produces({"application/xml", "application/json"})
 	public ResultEntity find(@PathParam("id") Long id) {
 		return super.find(id);
+	}
+
+	@GET
+	@Path("/query")
+	@Produces({"application/xml", "application/json"})
+	public List<ResultEntity> findForSearch(@QueryParam("searchId") Long searchId) {
+		SearchEntity search = em.find(SearchEntity.class, searchId);
+
+		Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity");
+		query.setParameter("searchEntity", search);
+
+		return query.getResultList();
 	}
 
 	@GET

@@ -27,6 +27,15 @@ public class UserEntity implements Serializable {
 	private String name;
 	@ManyToOne
 	private UserGroupEntity usergroup;
+	private Long universeid;
+
+	public Long getUniverseid() {
+		return universeid;
+	}
+
+	public void setUniverseid(Long id) {
+		this.universeid = id;
+	}
 
 	public String getUsername() {
 		return username;

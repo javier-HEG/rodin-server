@@ -53,6 +53,17 @@ public class TestFacadeREST {
 
 		em.persist(universe);
 
+		// Create universe
+		UniverseEntity anotherUniverse = new UniverseEntity();
+		anotherUniverse.setName("Another universe");
+		anotherUniverse.setOwner(user);
+
+		em.persist(anotherUniverse);
+
+		// Attribute universe to user
+		user.setUniverseid(universe.getId());
+		em.merge(user);
+
 		// Create source instance in test universe
 		SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
 		sourceInstance.setSourceName("ArXiv");

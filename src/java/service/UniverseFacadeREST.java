@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -17,6 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.user.UniverseEntity;
+import model.user.UserEntity;
+import model.user.UserGroupEntity;
 
 /**
  *
@@ -37,6 +40,12 @@ public class UniverseFacadeREST extends AbstractFacade<UniverseEntity> {
 	@Consumes({"application/xml", "application/json"})
 	public Response create(UniverseEntity entity, @Context UriInfo uriInfo) {
 		super.create(entity);
+
+		// Set the most recent universe as the last universe used
+		UserEntity owner = em.find(UserEntity.class, entity.getOwner().getUsername());
+		owner.setUniverseid(entity.getId());
+		getEntityManager().merge(owner);
+
 		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getId().toString()).build();
 		return Response.created(uri).build();
 	}

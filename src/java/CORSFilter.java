@@ -12,6 +12,7 @@ public class CORSFilter implements ContainerResponseFilter {
 		cresp.getHttpHeaders().putSingle("Access-Control-Allow-Credentials", "true");
 		cresp.getHttpHeaders().putSingle("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
 		cresp.getHttpHeaders().putSingle("Access-Control-Allow-Headers", "Content-Type, Accept");
+		cresp.getHttpHeaders().putSingle("Access-Control-Expose-Headers", "Location");
 
 		return cresp;
 	}

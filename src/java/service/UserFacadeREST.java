@@ -44,8 +44,9 @@ public class UserFacadeREST extends AbstractFacade<UserEntity> {
 	@POST
 	@Consumes({"application/xml", "application/json"})
 	public Response create(UserEntity entity, @Context UriInfo uriInfo) {
+		// Assign the default group to the user if not defined
 		if (entity.getUsergroup() == null) {
-			Query query = em.createQuery("select g from UserGroupEntity g where g.id='1'");
+			Query query = em.createQuery("select g from UserGroupEntity g where g.isDefault=true");
 
 			if (query.getResultList().size() > 0) {
 				entity.setUsergroup((UserGroupEntity) query.getResultList().get(0));

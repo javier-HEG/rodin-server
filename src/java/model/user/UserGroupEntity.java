@@ -5,6 +5,7 @@
 package model.user;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,6 +27,8 @@ public class UserGroupEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	private String name;
+	@Column(name = "ISDEFAULT")
+	private boolean isDefault = false;
 
 	public Integer getId() {
 		return id;
@@ -33,6 +36,14 @@ public class UserGroupEntity implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public boolean isIsDefault() {
+		return isDefault;
+	}
+
+	public void setIsDefault(boolean isDefault) {
+		this.isDefault = isDefault;
 	}
 
 	public String getName() {

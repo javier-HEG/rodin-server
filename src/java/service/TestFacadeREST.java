@@ -31,18 +31,25 @@ public class TestFacadeREST {
 		// Reset persistence
 		em.clear();
 
-		// Create user-groups first
-		UserGroupEntity groupEntity = new UserGroupEntity();
-		groupEntity.setName("users");
+		// Create and admin groups first
+		UserGroupEntity adminGroupEntity = new UserGroupEntity();
+		adminGroupEntity.setName("admin");
 
-		em.persist(groupEntity);
+		em.persist(adminGroupEntity);
+
+		// Create user-groups
+		UserGroupEntity userGroupEntity = new UserGroupEntity();
+		userGroupEntity.setName("users");
+		userGroupEntity.setIsDefault(true);
+
+		em.persist(userGroupEntity);
 
 		// Create user
 		UserEntity user = new UserEntity();
 		user.setUsername("testuser");
 		user.setName("Test User");
 		user.setPassword("test123");
-		user.setUsergroup(groupEntity);
+		user.setUsergroup(userGroupEntity);
 
 		em.persist(user);
 

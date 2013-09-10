@@ -7,11 +7,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -41,15 +43,15 @@ public class SourceInstanceFacadeREST extends AbstractFacade<SourceInstanceEntit
 	@GET
 	@Path("{id}")
 	@Produces({"application/xml", "application/json"})
-	public SourceInstanceEntity find(@PathParam("id") String id) {
+	public SourceInstanceEntity find(@PathParam("id") Long id) {
 		return super.find(id);
 	}
 
 	@GET
-	@Path("universe/{id}")
+	@Path("/query")
 	@Produces({"application/xml", "application/json"})
-	public List<SourceInstanceEntity> findAllInUniverse(@PathParam("id") String id) {
-		Query query = em.createQuery("select u from UniverseEntity u where u.id='" + id + "'");
+	public List<SourceInstanceEntity> findAllInUniverse(@QueryParam("universeId") Long universeId) {
+		Query query = em.createQuery("select u from UniverseEntity u where u.id='" + universeId + "'");
 		UniverseEntity universe = (UniverseEntity) query.getResultList().get(0);
 
 		query = em.createQuery("select s from SourceInstanceEntity s where s.universe=:universe").setParameter("universe", universe);
@@ -61,6 +63,12 @@ public class SourceInstanceFacadeREST extends AbstractFacade<SourceInstanceEntit
 	@Produces({"application/xml", "application/json"})
 	public List<SourceInstanceEntity> findAll() {
 		return super.findAll();
+	}
+
+	@DELETE
+	@Path("{id}")
+	public void remove(@PathParam("id") Long id) {
+		super.remove(super.find(id));
 	}
 
 	@Override

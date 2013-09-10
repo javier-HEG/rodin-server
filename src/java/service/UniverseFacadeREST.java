@@ -14,12 +14,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.user.UniverseEntity;
 import model.user.UserEntity;
-import model.user.UserGroupEntity;
 
 /**
  *
@@ -75,6 +75,18 @@ public class UniverseFacadeREST extends AbstractFacade<UniverseEntity> {
 	@Produces({"application/xml", "application/json"})
 	public List<UniverseEntity> findAll() {
 		return super.findAll();
+	}
+
+	@GET
+	@Path("/query")
+	@Produces({"application/xml", "application/json"})
+	public List<UniverseEntity> findAllForUser(@QueryParam("userId") String userId) {
+		UserEntity user = em.find(UserEntity.class, userId);
+
+		Query query = em.createQuery("select u from UniverseEntity u where u.owner=:userEntity");
+		query.setParameter("userEntity", user);
+
+		return query.getResultList();
 	}
 
 	@Override

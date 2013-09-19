@@ -39,7 +39,7 @@ public class TestFacadeREST {
 
 		// Create user-groups
 		UserGroupEntity userGroupEntity = new UserGroupEntity();
-		userGroupEntity.setName("users");
+		userGroupEntity.setName("user");
 		userGroupEntity.setIsDefault(true);
 
 		em.persist(userGroupEntity);

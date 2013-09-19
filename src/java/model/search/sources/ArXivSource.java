@@ -1,6 +1,5 @@
 package model.search.sources;
 
-import java.util.HashMap;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -8,11 +7,14 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Javier Belmonte
  */
 @XmlRootElement(name = "source")
-public class ArXivSource extends AbstractSource implements IDocumentSource {
+public class ArXivSource extends AbstractSource implements IDocumentSource, ILODSource {
 
 	public ArXivSource() {
 		super();
 		setName("ArXiv");
+
+		allowUserGroup("admin");
+		allowUserGroup("user");
 	}
 
 	@Override
@@ -21,7 +23,7 @@ public class ArXivSource extends AbstractSource implements IDocumentSource {
 	}
 
 	@Override
-	public HashMap<String, String> getParameterDescription() {
-		return new HashMap<String, String>();
+	public void findDocumentsAbout(String conceptURI) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

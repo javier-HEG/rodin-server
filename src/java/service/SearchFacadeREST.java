@@ -39,6 +39,7 @@ public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 	@POST
 	@Consumes({"application/xml", "application/json"})
 	public Response create(SearchEntity entity, @Context UriInfo uriInfo) {
+		// Set default type of search
 		if (entity.getType() == null) {
 			entity.setType(SearchEntity.SearchType.GLOBAL);
 		}

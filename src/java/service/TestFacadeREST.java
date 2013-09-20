@@ -28,57 +28,61 @@ public class TestFacadeREST {
 	@GET
 	@Produces("text/plain")
 	public Response initialize(@PathParam("id") String id) {
-		// Reset persistence
-		em.clear();
+		// Check for test user
+		UserEntity testuser = em.find(UserEntity.class, "testuser");
 
-		// Create and admin groups first
-		UserGroupEntity adminGroupEntity = new UserGroupEntity();
-		adminGroupEntity.setName("admin");
+		if (testuser == null) {
+			// Create and admin groups first
+			UserGroupEntity adminGroupEntity = new UserGroupEntity();
+			adminGroupEntity.setName("admin");
 
-		em.persist(adminGroupEntity);
+			em.persist(adminGroupEntity);
 
-		// Create user-groups
-		UserGroupEntity userGroupEntity = new UserGroupEntity();
-		userGroupEntity.setName("user");
-		userGroupEntity.setIsDefault(true);
+			// Create user-groups
+			UserGroupEntity userGroupEntity = new UserGroupEntity();
+			userGroupEntity.setName("user");
+			userGroupEntity.setIsDefault(true);
 
-		em.persist(userGroupEntity);
+			em.persist(userGroupEntity);
 
-		// Create user
-		UserEntity user = new UserEntity();
-		user.setUsername("testuser");
-		user.setName("Test User");
-		user.setPassword("test123");
-		user.setUsergroup(userGroupEntity);
+			// Create user
+			UserEntity user = new UserEntity();
+			user.setUsername("testuser");
+			user.setName("Test User");
+			user.setPassword("test123");
+			user.setUsergroup(userGroupEntity);
 
-		em.persist(user);
+			em.persist(user);
 
-		// Create universe
-		UniverseEntity universe = new UniverseEntity();
-		universe.setName("Test universe");
-		universe.setOwner(user);
+			// Create universe
+			UniverseEntity universe = new UniverseEntity();
+			universe.setName("Test universe");
+			universe.setOwner(user);
 
-		em.persist(universe);
+			em.persist(universe);
 
-		// Create universe
-		UniverseEntity anotherUniverse = new UniverseEntity();
-		anotherUniverse.setName("Another universe");
-		anotherUniverse.setOwner(user);
+			// Create universe
+			UniverseEntity anotherUniverse = new UniverseEntity();
+			anotherUniverse.setName("Another universe");
+			anotherUniverse.setOwner(user);
 
-		em.persist(anotherUniverse);
+			em.persist(anotherUniverse);
 
-		// Attribute universe to user
-		user.setUniverseid(universe.getId());
-		em.merge(user);
+			// Attribute universe to user
+			user.setUniverseid(universe.getId());
+			em.merge(user);
 
-		// Create source instance in test universe
-		SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
-		sourceInstance.setSourceName("ArXiv");
-		sourceInstance.setType(AbstractSource.SourceType.DOCUMENT);
-		sourceInstance.setUniverse(universe);
+			// Create source instance in test universe
+			SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
+			sourceInstance.setSourceName("ArXiv");
+			sourceInstance.setType(AbstractSource.SourceType.DOCUMENT);
+			sourceInstance.setUniverse(universe);
 
-		em.persist(sourceInstance);
+			em.persist(sourceInstance);
 
-		return Response.ok("Test objects created").build();
+			return Response.ok("Test objects created").build();
+		} else {
+			return Response.ok("Test objects already there").build();
+		}
 	}
 }

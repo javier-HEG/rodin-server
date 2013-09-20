@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Javier Belmonte
  */
 @XmlRootElement(name = "source")
-public class SwissBibSource extends AbstractSource implements IDocumentSource, IThesaurusSource {
+public class SwissBibSource extends AbstractSource implements IDocumentSource {
 
 	public SwissBibSource() {
 		super();
@@ -19,11 +19,6 @@ public class SwissBibSource extends AbstractSource implements IDocumentSource, I
 
 	@Override
 	public void findDocuments(String query) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void refine(String concept) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }

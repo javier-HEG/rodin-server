@@ -4,6 +4,9 @@
  */
 package model.search.sources;
 
+import java.util.List;
+import org.codehaus.jettison.json.JSONObject;
+
 /**
  *
  * @author rodin
@@ -11,4 +14,12 @@ package model.search.sources;
 public interface IThesaurusSource {
 
 	public void refine(String concept);
+
+	/**
+	 * Temporal method to process response from XXL server
+	 *
+	 * @param json
+	 * @return
+	 */
+	public List<String> termsfromJSON(JSONObject json);
 }

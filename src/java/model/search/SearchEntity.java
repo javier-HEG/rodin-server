@@ -109,6 +109,6 @@ public class SearchEntity implements Serializable {
 
 	public enum SearchType {
 
-		GLOBAL, SINGLE_DATASOURCE, DOCUMENT_EXPANSION, SUBJECT_EXPANSION
+		GLOBAL, SINGLE_DATASOURCE, SUBJECT_EXPANSION, DOCUMENT_EXPANSION
 	}
 }

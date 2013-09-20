@@ -31,8 +31,8 @@ public class GlobalSearch extends AbstractSearch {
 
 			WebResource resource = client.resource(rodinBaseUrl);
 
-			resource = resource.path("search.php");
-
+//			resource = resource.path("search.php");
+//
 //			Form params = new Form();
 //			params.add("query", getSearchEntity().getQuery());
 //			params.add("widgets", "swissbib,arxiv");

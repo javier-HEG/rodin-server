@@ -6,13 +6,15 @@ import javax.naming.NamingException;
 import model.search.AbstractSearch;
 import model.search.GlobalSearch;
 import model.search.SearchEntity;
+import static model.search.SearchEntity.SearchType.SUBJECT_EXPANSION;
+import model.search.ThesaurusSearch;
 import service.SearchFacadeREST;
 
 /**
  *
  * @author Javier Belmonte
  */
-public class SearchExecuter {
+public class SearchExecuter implements Runnable {
 
 	private Long searchId;
 	private AbstractSearch searchObject;
@@ -24,9 +26,11 @@ public class SearchExecuter {
 		SearchEntity entity = searchFacadeREST.find(searchId);
 
 		switch (entity.getType()) {
+			case SUBJECT_EXPANSION:
+				searchObject = new ThesaurusSearch();
+				break;
 			case SINGLE_DATASOURCE:
 			case DOCUMENT_EXPANSION:
-			case SUBJECT_EXPANSION:
 			case GLOBAL:
 			default:
 				searchObject = new GlobalSearch();
@@ -45,7 +49,8 @@ public class SearchExecuter {
 		}
 	}
 
-	public void launch() {
+	@Override
+	public void run() {
 		searchObject.execute();
 	}
 }

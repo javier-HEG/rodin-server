@@ -1,5 +1,7 @@
 package control;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -51,6 +53,21 @@ public class SearchExecuter implements Runnable {
 
 	@Override
 	public void run() {
+		try {
+			int safe = 0;
+			while (safe++ < 10 && !searchObject.isReady()) {
+				Thread.sleep(10);
+			}
+
+			if (safe >= 10) {
+				Logger.getLogger(SearchExecuter.class.getName()).log(Level.SEVERE, "Search object not ready in 100ms!");
+			} else {
+				Logger.getLogger(SearchExecuter.class.getName()).log(Level.OFF, "Thread woke up!");
+			}
+		} catch (InterruptedException ex) {
+			Logger.getLogger(SearchExecuter.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
 		searchObject.execute();
 	}
 }

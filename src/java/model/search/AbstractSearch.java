@@ -45,6 +45,10 @@ public abstract class AbstractSearch {
 		searchFacadeREST.edit(entity);
 	}
 
+	public boolean isReady() {
+		return searchFacadeREST.find(entityId) != null;
+	}
+
 	private SearchFacadeREST lookupSearchFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();

@@ -37,7 +37,9 @@ public class ResultEntity implements Serializable {
 	@Column(name = "PUBDATE")
 	private Date pubDate;
 	// Fields proper to Articles
+	@Column(columnDefinition = "TINYBLOB")
 	private String summary;
+	@Column(columnDefinition = "BLOB")
 	private String content;
 	private List<String> keywords;
 	private String review;

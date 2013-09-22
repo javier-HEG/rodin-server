@@ -53,9 +53,6 @@ public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 		Thread searchThread = new Thread(new SearchExecuter(entity.getId()));
 		searchThread.start();
 
-//		SearchExecuter executer = new SearchExecuter(entity.getId());
-//		executer.run();
-
 		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getId().toString()).build();
 		return Response.created(uri).build();
 	}

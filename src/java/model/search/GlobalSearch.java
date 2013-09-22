@@ -9,6 +9,10 @@ import javax.ws.rs.core.UriBuilder;
 import model.results.ResultEntity;
 import model.results.SourceDocumentEntity;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -64,9 +68,22 @@ public class GlobalSearch extends AbstractSearch {
 					result.addAuthor(author.trim());
 				}
 
+				result.setContent(details.getString("abstract"));
+
+				if (result.getContent().length() > 200) {
+					result.setSummary(result.getContent().substring(0, 200) + " ... ");
+				} else {
+					result.setSummary(result.getContent());
+				}
+
+				DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+				result.setPubDate(df.parse(details.getString("date")));
+
 				SourceDocumentEntity document = new SourceDocumentEntity();
 				document.setSourceLinkURL(details.getString("url"));
 				documentFacadeREST.create(document);
+
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, result.getTitle());
 
 				result.addDocument(document);
 				resultFacadeREST.create(result);

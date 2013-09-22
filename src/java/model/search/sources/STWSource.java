@@ -18,6 +18,14 @@ import org.codehaus.jettison.json.JSONObject;
  */
 public class STWSource extends AbstractSource implements IThesaurusSource {
 
+	public STWSource() {
+		super();
+		setName("STW");
+
+		allowUserGroup("admin");
+		allowUserGroup("user");
+	}
+
 	@Override
 	public void refine(String concept) {
 		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

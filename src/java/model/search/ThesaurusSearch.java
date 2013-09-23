@@ -29,7 +29,7 @@ public class ThesaurusSearch extends AbstractSearch {
 	@Override
 	protected void executeSearch() {
 		try {
-			URI rodinBaseUrl = UriBuilder.fromUri("http://localhost:80/rodin-mobile/rodin-thesaurus.txt").build();
+			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-thesaurus.txt").build();
 
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);

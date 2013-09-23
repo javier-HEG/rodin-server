@@ -28,8 +28,7 @@ public class GlobalSearch extends AbstractSearch {
 	protected void executeSearch() {
 		try {
 //			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
-			URI rodinBaseUrl = UriBuilder.fromUri("http://localhost:80/rodin-mobile/rodin-search.txt").build();
-
+			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-search.txt").build();
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
 

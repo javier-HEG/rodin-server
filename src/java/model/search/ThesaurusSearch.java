@@ -10,6 +10,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +18,7 @@ import javax.ws.rs.core.UriBuilder;
 import model.results.ResultEntity;
 import model.search.sources.AbstractSource;
 import model.search.sources.IThesaurusSource;
+import model.search.sources.IThesaurusSource.ExpansionCategories;
 import model.search.sources.SourceManager;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -54,25 +56,28 @@ public class ThesaurusSearch extends AbstractSearch {
 				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.THESAURUS)) {
 					IThesaurusSource thesaurusSource = (IThesaurusSource) source;
 
-					List<String> terms = thesaurusSource.termsfromJSON(sourceResults);
+					EnumMap<ExpansionCategories, List<String>> terms = thesaurusSource.termsfromJSON(sourceResults);
 
-					StringBuilder builder = new StringBuilder();
-					builder.append(terms.remove(0));
+					for (ExpansionCategories category : terms.keySet()) {
+						StringBuilder builder = new StringBuilder();
+						builder.append(terms.get(category).remove(0));
 
-					for (String s : terms) {
-						builder.append(",");
-						builder.append(s);
+						for (String s : terms.get(category)) {
+							builder.append(",");
+							builder.append(s);
+						}
+
+						String termString = builder.toString();
+
+						Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, termString);
+
+						ResultEntity result = new ResultEntity();
+						result.setSearch(getSearchEntity());
+						result.setContent(termString);
+						result.setKeywords(Arrays.asList(category.toString()));
+
+						resultFacadeREST.create(result);
 					}
-
-					String termString = builder.toString();
-
-					Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, termString);
-
-					ResultEntity result = new ResultEntity();
-					result.setSearch(getSearchEntity());
-					result.setContent(termString);
-
-					resultFacadeREST.create(result);
 				}
 			}
 		} catch (Exception ex) {

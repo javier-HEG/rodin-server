@@ -5,6 +5,7 @@
 package model.search.sources;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,20 +33,28 @@ public class LOCSHSource extends AbstractSource implements IThesaurusSource {
 	}
 
 	@Override
-	public List<String> termsfromJSON(JSONObject json) {
-		ArrayList<String> terms = new ArrayList<String>();
+	public EnumMap<ExpansionCategories, List<String>> termsfromJSON(JSONObject json) {
+		EnumMap<ExpansionCategories, List<String>> terms = new EnumMap<ExpansionCategories, List<String>>(ExpansionCategories.class);
 
 		try {
+			ArrayList<String> broaderTerms = new ArrayList<String>();
 			JSONArray broaderArray = json.getJSONArray("b");
-
 			for (int i = 0; i < broaderArray.length(); i++) {
-				terms.add(broaderArray.getString(i));
+				broaderTerms.add(broaderArray.getString(i));
 			}
 
-			JSONArray narrowerArray = json.getJSONArray("n");
+			if (broaderTerms.size() > 0) {
+				terms.put(ExpansionCategories.BROADER, broaderTerms);
+			}
 
+			ArrayList<String> narrowerTerms = new ArrayList<String>();
+			JSONArray narrowerArray = json.getJSONArray("n");
 			for (int i = 0; i < narrowerArray.length(); i++) {
-				terms.add(narrowerArray.getString(i));
+				narrowerTerms.add(narrowerArray.getString(i));
+			}
+
+			if (broaderTerms.size() > 0) {
+				terms.put(ExpansionCategories.NARROWER, narrowerTerms);
 			}
 		} catch (JSONException ex) {
 			Logger.getLogger(LOCSHSource.class.getName()).log(Level.SEVERE, null, ex);

@@ -11,8 +11,6 @@ import model.results.SourceDocumentEntity;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.codehaus.jettison.json.JSONArray;
@@ -28,7 +26,8 @@ public class GlobalSearch extends AbstractSearch {
 	protected void executeSearch() {
 		try {
 //			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
-			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-search.txt").build();
+//			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-search.txt").build();
+			URI rodinBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search.txt").build();
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
 

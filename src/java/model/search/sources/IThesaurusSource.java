@@ -4,6 +4,7 @@
  */
 package model.search.sources;
 
+import java.util.EnumMap;
 import java.util.List;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -21,5 +22,10 @@ public interface IThesaurusSource {
 	 * @param json
 	 * @return
 	 */
-	public List<String> termsfromJSON(JSONObject json);
+	public EnumMap<ExpansionCategories, List<String>> termsfromJSON(JSONObject json);
+
+	public enum ExpansionCategories {
+
+		NARROWER, BROADER, RELATED
+	}
 }

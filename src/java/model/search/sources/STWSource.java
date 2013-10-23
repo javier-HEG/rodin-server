@@ -5,6 +5,7 @@
 package model.search.sources;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,14 +33,18 @@ public class STWSource extends AbstractSource implements IThesaurusSource {
 	}
 
 	@Override
-	public List<String> termsfromJSON(JSONObject json) {
-		ArrayList<String> terms = new ArrayList<String>();
+	public EnumMap<ExpansionCategories, List<String>> termsfromJSON(JSONObject json) {
+		EnumMap<ExpansionCategories, List<String>> terms = new EnumMap<ExpansionCategories, List<String>>(ExpansionCategories.class);
 
 		try {
+			ArrayList<String> relatedTerms = new ArrayList<String>();
 			JSONArray array = json.getJSONArray("r");
-
 			for (int i = 0; i < array.length(); i++) {
-				terms.add(array.getString(i));
+				relatedTerms.add(array.getString(i));
+			}
+
+			if (relatedTerms.size() > 0) {
+				terms.put(ExpansionCategories.RELATED, relatedTerms);
 			}
 		} catch (JSONException ex) {
 			Logger.getLogger(STWSource.class.getName()).log(Level.SEVERE, null, ex);

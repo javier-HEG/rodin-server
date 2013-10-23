@@ -27,6 +27,7 @@ public class UserEntity implements Serializable {
 	private String name;
 	@ManyToOne
 	private UserGroupEntity usergroup;
+	private Language userlang = Language.en;
 	private Long universeid;
 
 	public Long getUniverseid() {
@@ -35,6 +36,14 @@ public class UserEntity implements Serializable {
 
 	public void setUniverseid(Long id) {
 		this.universeid = id;
+	}
+
+	public Language getUserlang() {
+		return userlang;
+	}
+
+	public void setUserlang(Language userlang) {
+		this.userlang = userlang;
 	}
 
 	public String getUsername() {
@@ -92,5 +101,10 @@ public class UserEntity implements Serializable {
 	@Override
 	public String toString() {
 		return "entities.User[ id=" + username + " ]";
+	}
+
+	public enum Language {
+
+		en, fr, de, it
 	}
 }

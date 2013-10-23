@@ -10,11 +10,14 @@ import java.util.ArrayList;
 public abstract class AbstractSource implements Serializable {
 
 	private String name;
+	// The name used in the requests to XXL Server
+	private String xxlCodeName;
 	private SourceStatus status;
 	private ArrayList<String> allowedUserGroups;
 
 	protected AbstractSource() {
 		name = "Default";
+		xxlCodeName = "default";
 		status = SourceStatus.IDLE;
 
 		allowedUserGroups = new ArrayList<String>();
@@ -26,6 +29,14 @@ public abstract class AbstractSource implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getXxlCodeName() {
+		return xxlCodeName;
+	}
+
+	public void setXxlCodeName(String xxlCodeName) {
+		this.xxlCodeName = xxlCodeName;
 	}
 
 	public SourceStatus getStatus() {

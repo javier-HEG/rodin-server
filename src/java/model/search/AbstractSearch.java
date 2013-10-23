@@ -8,6 +8,7 @@ import javax.naming.NamingException;
 import service.DocumentFacadeREST;
 import service.ResultFacadeREST;
 import service.SearchFacadeREST;
+import service.SourceInstanceFacadeREST;
 
 /**
  *
@@ -15,6 +16,7 @@ import service.SearchFacadeREST;
  */
 public abstract class AbstractSearch {
 
+	protected SourceInstanceFacadeREST sourceInstanceFacadeREST = lookupSourceInstanceFacadeRESTBean();
 	private SearchFacadeREST searchFacadeREST = lookupSearchFacadeRESTBean();
 	protected ResultFacadeREST resultFacadeREST = lookupResultFacadeRESTBean();
 	protected DocumentFacadeREST documentFacadeREST = lookupDocumentFacadeRESTBean();
@@ -53,6 +55,16 @@ public abstract class AbstractSearch {
 		try {
 			Context c = new InitialContext();
 			return (SearchFacadeREST) c.lookup("java:global/RODIN_Server/SearchFacadeREST!service.SearchFacadeREST");
+		} catch (NamingException ne) {
+			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+			throw new RuntimeException(ne);
+		}
+	}
+
+	private SourceInstanceFacadeREST lookupSourceInstanceFacadeRESTBean() {
+		try {
+			Context c = new InitialContext();
+			return (SourceInstanceFacadeREST) c.lookup("java:global/RODIN_Server/SourceInstanceFacadeREST!service.SourceInstanceFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);

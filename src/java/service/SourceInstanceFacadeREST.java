@@ -2,6 +2,7 @@ package service;
 
 import java.net.URI;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,6 +26,7 @@ import model.user.UniverseEntity;
  * @author Javier Belmonte
  */
 @Stateless
+@EJB(beanInterface = AbstractFacade.class, name = "SourceInstanceFacadeREST")
 @Path("sourceinstance")
 public class SourceInstanceFacadeREST extends AbstractFacade<SourceInstanceEntity> {
 

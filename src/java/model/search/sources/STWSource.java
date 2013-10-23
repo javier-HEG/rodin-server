@@ -22,6 +22,7 @@ public class STWSource extends AbstractSource implements IThesaurusSource {
 	public STWSource() {
 		super();
 		setName("STW");
+		setXxlCodeName("stw");
 
 		allowUserGroup("admin");
 		allowUserGroup("user");

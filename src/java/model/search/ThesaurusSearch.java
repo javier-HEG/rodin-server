@@ -8,18 +8,23 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.representation.Form;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import model.results.ResultEntity;
 import model.search.sources.AbstractSource;
 import model.search.sources.IThesaurusSource;
 import model.search.sources.IThesaurusSource.ExpansionCategories;
+import model.search.sources.SourceInstanceEntity;
 import model.search.sources.SourceManager;
+import model.user.UniverseEntity;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -30,28 +35,56 @@ public class ThesaurusSearch extends AbstractSearch {
 
 	@Override
 	protected void executeSearch() {
-		try {
-			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-thesaurus.txt").build();
+		// Get the sources in the universe
+		SearchEntity search = getSearchEntity();
+		UniverseEntity universe = search.getUniverse();
+		List<SourceInstanceEntity> sourceInstances = sourceInstanceFacadeREST.findAllInUniverse(universe.getId());
 
+		ArrayList<AbstractSource> sources = new ArrayList<AbstractSource>();
+		for (SourceInstanceEntity sourceInstance : sourceInstances) {
+			AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
+
+			if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.THESAURUS)) {
+				sources.add(source);
+			}
+		}
+
+		// Build the parameters for the call
+		StringBuilder sourceListBuilder = new StringBuilder();
+		sourceListBuilder.append(sources.get(0).getXxlCodeName());
+		for (int i = 1; i < sources.size(); i++) {
+			sourceListBuilder.append(",");
+			sourceListBuilder.append(sources.get(i).getXxlCodeName());
+		}
+
+		Form params = new Form();
+		params.add("query", getSearchEntity().getQuery());
+		params.add("thesources", sourceListBuilder.toString());
+		params.add("userid", "11");
+		params.add("m", "3");
+
+		try {
+			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
 
 			WebResource resource = client.resource(rodinBaseUrl);
+			resource = resource.path("thesearch.php");
+			resource = resource.queryParams(params);
+			resource.accept(MediaType.APPLICATION_JSON);
 
-//			resource.accept(MediaType.APPLICATION_JSON);
+			Logger.getLogger(ThesaurusSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
 
-			String response = resource.get(String.class);
+			URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-thesaurus.txt").build();
+			WebResource cacheResource = client.resource(cacheBaseUrl);
+
+			String response = cacheResource.get(String.class);
 			JSONObject responseObject = new JSONObject(response);
-
-			List<String> sourcesNames = Arrays.asList("STW", "LOCSH");
 
 			JSONObject allResults = responseObject.getJSONObject("skostheresults");
 
-			for (String sourceName : sourcesNames) {
-				JSONObject sourceResults = allResults.getJSONObject(sourceName);
-
-				Class sourceClass = Class.forName("model.search.sources." + sourceName + "Source");
-				AbstractSource source = (AbstractSource) sourceClass.newInstance();
+			for (AbstractSource source : sources) {
+				JSONObject sourceResults = allResults.getJSONObject(source.getName());
 
 				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.THESAURUS)) {
 					IThesaurusSource thesaurusSource = (IThesaurusSource) source;
@@ -59,21 +92,19 @@ public class ThesaurusSearch extends AbstractSearch {
 					EnumMap<ExpansionCategories, List<String>> terms = thesaurusSource.termsfromJSON(sourceResults);
 
 					for (ExpansionCategories category : terms.keySet()) {
-						StringBuilder builder = new StringBuilder();
-						builder.append(terms.get(category).remove(0));
+						StringBuilder termListBuilder = new StringBuilder();
+						termListBuilder.append(terms.get(category).remove(0));
 
 						for (String s : terms.get(category)) {
-							builder.append(",");
-							builder.append(s);
+							termListBuilder.append(",");
+							termListBuilder.append(s);
 						}
 
-						String termString = builder.toString();
-
-						Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, termString);
+						Logger.getLogger(ThesaurusSearch.class.getName()).log(Level.OFF, termListBuilder.toString());
 
 						ResultEntity result = new ResultEntity();
 						result.setSearch(getSearchEntity());
-						result.setContent(termString);
+						result.setContent(termListBuilder.toString());
 						result.setKeywords(Arrays.asList(category.toString()));
 
 						resultFacadeREST.create(result);
@@ -81,7 +112,7 @@ public class ThesaurusSearch extends AbstractSearch {
 				}
 			}
 		} catch (Exception ex) {
-			Logger.getLogger(GlobalSearch.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(ThesaurusSearch.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 }

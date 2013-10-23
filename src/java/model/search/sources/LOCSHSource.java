@@ -22,6 +22,7 @@ public class LOCSHSource extends AbstractSource implements IThesaurusSource {
 	public LOCSHSource() {
 		super();
 		setName("LOCSH");
+		setXxlCodeName("locsh");
 
 		allowUserGroup("admin");
 		allowUserGroup("user");

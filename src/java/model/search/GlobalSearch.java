@@ -11,8 +11,14 @@ import model.results.SourceDocumentEntity;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
+import model.search.sources.AbstractSource;
+import model.search.sources.SourceInstanceEntity;
+import model.search.sources.SourceManager;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -24,27 +30,52 @@ public class GlobalSearch extends AbstractSearch {
 
 	@Override
 	protected void executeSearch() {
+
+		// Get the sources in the universe
+		SearchEntity search = getSearchEntity();
+		List<SourceInstanceEntity> sourceInstances = sourceInstanceFacadeREST.findAllInUniverse(search.getUniverse().getId());
+
+		ArrayList<AbstractSource> sources = new ArrayList<AbstractSource>();
+		for (SourceInstanceEntity sourceInstance : sourceInstances) {
+			AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
+
+			if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.DOCUMENT)) {
+				sources.add(source);
+			}
+		}
+
+		// Build the parameters for the call
+		StringBuilder sourceListBuilder = new StringBuilder();
+		sourceListBuilder.append(sources.get(0).getXxlCodeName());
+		for (int i = 1; i < sources.size(); i++) {
+			sourceListBuilder.append(",");
+			sourceListBuilder.append(sources.get(i).getXxlCodeName());
+		}
+
+		Form params = new Form();
+		params.add("query", getSearchEntity().getQuery());
+		params.add("widgets", sourceListBuilder.toString());
+		params.add("userid", "11");
+		params.add("k", "0");
+		params.add("m", "10");
+
+
 		try {
-//			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
-//			URI rodinBaseUrl = UriBuilder.fromUri("http://ec2-54-216-54-211.eu-west-1.compute.amazonaws.com/rodin-search.txt").build();
-			URI rodinBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search.txt").build();
+			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
 			ClientConfig config = new DefaultClientConfig();
 			Client client = Client.create(config);
 
 			WebResource resource = client.resource(rodinBaseUrl);
+			resource = resource.path("search.php");
+			resource = resource.queryParams(params);
+			resource.accept(MediaType.APPLICATION_JSON);
 
-//			resource = resource.path("search.php");
-//
-//			Form params = new Form();
-//			params.add("query", getSearchEntity().getQuery());
-//			params.add("widgets", "swissbib,arxiv");
-//			params.add("userid", "2");
-//			params.add("m", "5");
-//			resource = resource.queryParams(params);
+			Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
 
-//			resource.accept(MediaType.APPLICATION_JSON);
+			URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search-2.txt").build();
+			WebResource cacheResource = client.resource(cacheBaseUrl);
 
-			String response = resource.get(String.class);
+			String response = cacheResource.get(String.class);
 			JSONObject responseObject = new JSONObject(response);
 
 			JSONArray allResults = responseObject.getJSONArray("results");
@@ -52,18 +83,32 @@ public class GlobalSearch extends AbstractSearch {
 			for (int i = 0; i < allResults.length(); i++) {
 				String detailString = allResults.getJSONObject(i).getString("toDetails");
 				detailString = detailString.replaceAll("\\\\/", "\\/");
-				detailString = detailString.replaceAll("\\\\n", " ");
-				detailString = detailString.replaceAll("\\\\\"", "\\\"");
+				detailString = detailString.replaceAll("\\\\n", " "); // \n
+				// detailString = detailString.replaceAll("\\\\\"", "\\\"");
+				detailString = detailString.replaceAll("\\\\\"", "");
+				detailString = detailString.replaceAll("\\{\\\\\\\\\\\"o\\}", "ö"); // {\\"o}
 
 				JSONObject details = new JSONObject(detailString);
 
 				ResultEntity result = new ResultEntity();
 				result.setSearch(getSearchEntity());
 
+				if (details.getString("type").equals("ARTICLE")) {
+					result.setType(ResultEntity.ResultType.ARTICLE);
+				} else if (details.getString("type").equals("BOOK")) {
+					result.setType(ResultEntity.ResultType.BOOK);
+				} else if (details.getString("type").equals("URL")) {
+					result.setType(ResultEntity.ResultType.BOOK);
+				} else {
+					result.setType(ResultEntity.ResultType.BASIC);
+				}
+
 				result.setTitle(details.getString("title"));
 
-				for (String author : details.getString("authors").split(", ")) {
-					result.addAuthor(author.trim());
+				if (!details.getString("authors").equals("")) {
+					for (String author : details.getString("authors").split(", ")) {
+						result.addAuthor(author.trim());
+					}
 				}
 
 				result.setContent(details.getString("abstract"));

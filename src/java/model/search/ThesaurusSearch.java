@@ -24,7 +24,6 @@ import model.search.sources.IThesaurusSource;
 import model.search.sources.IThesaurusSource.ExpansionCategories;
 import model.search.sources.SourceInstanceEntity;
 import model.search.sources.SourceManager;
-import model.user.UniverseEntity;
 import org.codehaus.jettison.json.JSONObject;
 
 /**
@@ -37,8 +36,7 @@ public class ThesaurusSearch extends AbstractSearch {
 	protected void executeSearch() {
 		// Get the sources in the universe
 		SearchEntity search = getSearchEntity();
-		UniverseEntity universe = search.getUniverse();
-		List<SourceInstanceEntity> sourceInstances = sourceInstanceFacadeREST.findAllInUniverse(universe.getId());
+		List<SourceInstanceEntity> sourceInstances = sourceInstanceFacadeREST.findAllInUniverse(search.getUniverse().getId());
 
 		ArrayList<AbstractSource> sources = new ArrayList<AbstractSource>();
 		for (SourceInstanceEntity sourceInstance : sourceInstances) {
@@ -61,7 +59,7 @@ public class ThesaurusSearch extends AbstractSearch {
 		params.add("query", getSearchEntity().getQuery());
 		params.add("thesources", sourceListBuilder.toString());
 		params.add("userid", "11");
-		params.add("m", "3");
+		params.add("m", "10");
 
 		try {
 			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
@@ -73,7 +71,7 @@ public class ThesaurusSearch extends AbstractSearch {
 			resource = resource.queryParams(params);
 			resource.accept(MediaType.APPLICATION_JSON);
 
-			Logger.getLogger(ThesaurusSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
+			Logger.getLogger(ThesaurusSearch.class.getName()).log(Level.OFF, "XXL-TH-URL: " + resource.getURI());
 
 			URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-thesaurus.txt").build();
 			WebResource cacheResource = client.resource(cacheBaseUrl);

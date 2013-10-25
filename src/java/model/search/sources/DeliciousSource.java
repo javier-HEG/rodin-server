@@ -7,12 +7,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Javier Belmonte
  */
 @XmlRootElement(name = "source")
-public class SwissBibSource extends AbstractSource implements IDocumentSource {
+public class DeliciousSource extends AbstractSource implements IDocumentSource {
 
-	public SwissBibSource() {
+	public DeliciousSource() {
 		super();
-		setName("SwissBib");
-		setXxlCodeName("swissbib");
+		setName("Delicious");
+		setXxlCodeName("delicious");
 
 		allowUserGroup("admin");
 		allowUserGroup("user");

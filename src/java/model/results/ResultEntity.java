@@ -31,6 +31,7 @@ public class ResultEntity implements Serializable {
 	private Long id;
 	@ManyToOne
 	private SearchEntity search;
+	private ResultType type = ResultType.BASIC;
 	private String title;
 	private List<String> authors;
 	@Temporal(javax.persistence.TemporalType.DATE)
@@ -59,6 +60,14 @@ public class ResultEntity implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public ResultType getType() {
+		return type;
+	}
+
+	public void setType(ResultType type) {
+		this.type = type;
 	}
 
 	public String getTitle() {
@@ -176,6 +185,6 @@ public class ResultEntity implements Serializable {
 
 	public enum ResultType {
 
-		BASIC, ARTICLE
+		BASIC, ARTICLE, BOOK, URL
 	}
 }

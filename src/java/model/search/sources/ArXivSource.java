@@ -12,6 +12,7 @@ public class ArXivSource extends AbstractSource implements IDocumentSource, ILOD
 	public ArXivSource() {
 		super();
 		setName("ArXiv");
+		setXxlCodeName("arxiv");
 
 		allowUserGroup("admin");
 		allowUserGroup("user");

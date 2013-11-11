@@ -1,5 +1,12 @@
 package model.search;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.Context;
@@ -17,13 +24,19 @@ import service.SourceInstanceFacadeREST;
 public abstract class AbstractSearch {
 
 	protected SourceInstanceFacadeREST sourceInstanceFacadeREST = lookupSourceInstanceFacadeRESTBean();
-	private SearchFacadeREST searchFacadeREST = lookupSearchFacadeRESTBean();
+	protected SearchFacadeREST searchFacadeREST = lookupSearchFacadeRESTBean();
 	protected ResultFacadeREST resultFacadeREST = lookupResultFacadeRESTBean();
 	protected DocumentFacadeREST documentFacadeREST = lookupDocumentFacadeRESTBean();
 	private Long entityId;
+	protected Long referenceId;
+	protected String cacheHash;
 
 	public void init(Long entityId) {
 		this.entityId = entityId;
+
+		SearchEntity search = getSearchEntity();
+		referenceId = search.getReferenceId();
+		cacheHash = search.getCacheHash();
 
 		setStatus(SearchStatus.INITIALIZATION);
 	}
@@ -31,9 +44,13 @@ public abstract class AbstractSearch {
 	public void execute() {
 		setStatus(SearchStatus.SEARCHING);
 		executeSearch();
+		setCacheInformation();
 		setStatus(SearchStatus.DONE);
 	}
 
+	/**
+	 * Runs the search and sets the cache's hash value for later
+	 */
 	protected abstract void executeSearch();
 
 	protected SearchEntity getSearchEntity() {
@@ -43,8 +60,55 @@ public abstract class AbstractSearch {
 	protected void setStatus(SearchStatus newStatus) {
 		SearchEntity entity = searchFacadeREST.find(entityId);
 		entity.setStatus(newStatus);
+		entity.setLastUpdated(new Timestamp(new Date().getTime()));
 
 		searchFacadeREST.edit(entity);
+	}
+
+	protected void setCacheInformation() {
+		SearchEntity entity = searchFacadeREST.find(entityId);
+		entity.setCacheHash(cacheHash);
+		entity.setReferenceId(referenceId);
+
+		searchFacadeREST.edit(entity);
+	}
+
+	protected String computeCacheHash(SearchEntity.SearchType type, String toHash) {
+		String cacheHash = "";
+
+		try {
+			String message = type + toHash;
+			MessageDigest m = MessageDigest.getInstance("MD5");
+			m.update(message.getBytes(), 0, message.length());
+			cacheHash = new BigInteger(1, m.digest()).toString(16);
+		} catch (NoSuchAlgorithmException ex) {
+			Logger.getLogger(AbstractSearch.class.getName()).log(Level.SEVERE, null, ex);
+		}
+
+		return cacheHash;
+	}
+
+	protected String cleanString(String input) {
+		String output = input.replaceAll("\\\\/", "\\/");
+		output = output.replaceAll("\\\\n", " "); // \n
+		// output = output.replaceAll("\\\\\"", "\\\"");
+		output = output.replaceAll("\\\\\"", "");
+		output = output.replaceAll("\\{\\\\\\\\\\\"o\\}", "ö"); // {\\"o}
+
+		return output;
+	}
+
+	protected Date parseDate(String dateString) {
+		String[] formatStrings = {"dd.MM.yyyy", "yyyy-MM-dd'T'HH:mm:ss'Z'"};
+
+		for (String formatString : formatStrings) {
+			try {
+				return new SimpleDateFormat(formatString).parse(dateString);
+			} catch (ParseException ex) {
+			}
+		}
+
+		return null;
 	}
 
 	public boolean isReady() {
@@ -88,6 +152,8 @@ public abstract class AbstractSearch {
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);
+
+
 		}
 	}
 

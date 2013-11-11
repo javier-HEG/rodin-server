@@ -7,6 +7,7 @@ import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -81,5 +82,16 @@ public class SearchFacadeREST extends AbstractFacade<SearchEntity> {
 	@Override
 	protected EntityManager getEntityManager() {
 		return em;
+	}
+
+	public SearchEntity findFirstByCache(String cacheHash) {
+		Query query = em.createQuery("select g from SearchEntity g where g.cacheHash=:cacheHash and g.referenceId=-1");
+		query.setParameter("cacheHash", cacheHash);
+
+		if (query.getResultList().size() > 0) {
+			return (SearchEntity) query.getResultList().get(0);
+		} else {
+			return null;
+		}
 	}
 }

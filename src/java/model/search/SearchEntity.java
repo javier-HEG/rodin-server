@@ -1,6 +1,7 @@
 package model.search;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,9 +28,12 @@ public class SearchEntity implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	private String cacheHash;
+	private Long referenceId;
 	private String query;
 	private SearchType type;
 	private SearchStatus status;
+	private Timestamp lastUpdated;
 	@ManyToOne
 	private UniverseEntity universe;
 	@ManyToOne
@@ -45,6 +49,26 @@ public class SearchEntity implements Serializable {
 
 	public Long getId() {
 		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getCacheHash() {
+		return cacheHash;
+	}
+
+	public void setCacheHash(String cacheHash) {
+		this.cacheHash = cacheHash;
+	}
+
+	public Long getReferenceId() {
+		return referenceId;
+	}
+
+	public void setReferenceId(Long referenceId) {
+		this.referenceId = referenceId;
 	}
 
 	public String getQuery() {
@@ -67,6 +91,10 @@ public class SearchEntity implements Serializable {
 		return status;
 	}
 
+	public void setStatus(SearchStatus status) {
+		this.status = status;
+	}
+
 	public SourceInstanceEntity getSource() {
 		return source;
 	}
@@ -75,12 +103,12 @@ public class SearchEntity implements Serializable {
 		this.source = source;
 	}
 
-	public void setStatus(SearchStatus status) {
-		this.status = status;
+	public Timestamp getLastUpdated() {
+		return lastUpdated;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setLastUpdated(Timestamp lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 	@Override

@@ -9,8 +9,6 @@ import javax.ws.rs.core.UriBuilder;
 import model.results.ResultEntity;
 import model.results.SourceDocumentEntity;
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -59,80 +57,86 @@ public class GlobalSearch extends AbstractSearch {
 		params.add("k", "0");
 		params.add("m", "10");
 
+		// Build the hash for the cache
+		String toHash = params.getFirst("query") + params.getFirst("widgets");
+		cacheHash = computeCacheHash(SearchEntity.SearchType.GLOBAL, toHash);
 
-		try {
-			URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
-			ClientConfig config = new DefaultClientConfig();
-			Client client = Client.create(config);
+		// Look for a search with same cache hash
+		SearchEntity referenceSearch = searchFacadeREST.findFirstByCache(cacheHash);
 
-			WebResource resource = client.resource(rodinBaseUrl);
-			resource = resource.path("search.php");
-			resource = resource.queryParams(params);
-			resource.accept(MediaType.APPLICATION_JSON);
+		if (referenceSearch != null) {
+			referenceId = referenceSearch.getId();
+		} else {
+			referenceId = new Long(-1);
 
-			Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
+			try {
+				URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
+				ClientConfig config = new DefaultClientConfig();
+				Client client = Client.create(config);
 
-			URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search-2.txt").build();
-			WebResource cacheResource = client.resource(cacheBaseUrl);
+				WebResource resource = client.resource(rodinBaseUrl);
+				resource = resource.path("search.php");
+				resource = resource.queryParams(params);
+				resource.accept(MediaType.APPLICATION_JSON);
 
-			String response = cacheResource.get(String.class);
-			JSONObject responseObject = new JSONObject(response);
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
 
-			JSONArray allResults = responseObject.getJSONArray("results");
+				URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search-2.txt").build();
+				WebResource cacheResource = client.resource(cacheBaseUrl);
 
-			for (int i = 0; i < allResults.length(); i++) {
-				String detailString = allResults.getJSONObject(i).getString("toDetails");
-				detailString = detailString.replaceAll("\\\\/", "\\/");
-				detailString = detailString.replaceAll("\\\\n", " "); // \n
-				// detailString = detailString.replaceAll("\\\\\"", "\\\"");
-				detailString = detailString.replaceAll("\\\\\"", "");
-				detailString = detailString.replaceAll("\\{\\\\\\\\\\\"o\\}", "ö"); // {\\"o}
+				String response = resource.get(String.class);
+				JSONObject responseObject = new JSONObject(response);
 
-				JSONObject details = new JSONObject(detailString);
+				JSONArray allResults = responseObject.getJSONArray("results");
 
-				ResultEntity result = new ResultEntity();
-				result.setSearch(getSearchEntity());
+				for (int i = 0; i < allResults.length(); i++) {
+					String detailString = cleanString(allResults.getJSONObject(i).getString("toDetails"));
 
-				if (details.getString("type").equals("ARTICLE")) {
-					result.setType(ResultEntity.ResultType.ARTICLE);
-				} else if (details.getString("type").equals("BOOK")) {
-					result.setType(ResultEntity.ResultType.BOOK);
-				} else if (details.getString("type").equals("URL")) {
-					result.setType(ResultEntity.ResultType.BOOK);
-				} else {
-					result.setType(ResultEntity.ResultType.BASIC);
-				}
+					JSONObject details = new JSONObject(detailString);
 
-				result.setTitle(details.getString("title"));
+					ResultEntity result = new ResultEntity();
+					result.setSearch(getSearchEntity());
 
-				if (!details.getString("authors").equals("")) {
-					for (String author : details.getString("authors").split(", ")) {
-						result.addAuthor(author.trim());
+					if (details.getString("type").equals("ARTICLE")) {
+						result.setType(ResultEntity.ResultType.ARTICLE);
+					} else if (details.getString("type").equals("BOOK")) {
+						result.setType(ResultEntity.ResultType.BOOK);
+					} else if (details.getString("type").equals("URL")) {
+						result.setType(ResultEntity.ResultType.BOOK);
+					} else {
+						result.setType(ResultEntity.ResultType.BASIC);
 					}
+
+					result.setTitle(details.getString("title"));
+
+					if (!details.getString("authors").equals("")) {
+						for (String author : details.getString("authors").split(", ")) {
+							result.addAuthor(author.trim());
+						}
+					}
+
+					result.setContent(details.getString("abstract"));
+
+					if (result.getContent().length() > 200) {
+						result.setSummary(result.getContent().substring(0, 200) + " ... ");
+					} else {
+						result.setSummary(result.getContent());
+					}
+
+					result.setPubDate(parseDate(details.getString("date")));
+
+					SourceDocumentEntity document = new SourceDocumentEntity();
+					document.setSourceLinkURL(details.getString("url"));
+					documentFacadeREST.create(document);
+
+					Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, result.getTitle());
+
+					result.addDocument(document);
+					resultFacadeREST.create(result);
 				}
-
-				result.setContent(details.getString("abstract"));
-
-				if (result.getContent().length() > 200) {
-					result.setSummary(result.getContent().substring(0, 200) + " ... ");
-				} else {
-					result.setSummary(result.getContent());
-				}
-
-				DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-				result.setPubDate(df.parse(details.getString("date")));
-
-				SourceDocumentEntity document = new SourceDocumentEntity();
-				document.setSourceLinkURL(details.getString("url"));
-				documentFacadeREST.create(document);
-
-				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, result.getTitle());
-
-				result.addDocument(document);
-				resultFacadeREST.create(result);
+			} catch (Exception ex) {
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.SEVERE, null, ex);
 			}
-		} catch (Exception ex) {
-			Logger.getLogger(GlobalSearch.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 }

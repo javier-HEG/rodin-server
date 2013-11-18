@@ -12,7 +12,7 @@ import model.user.UserEntity;
  */
 public class SourceManager {
 
-	public static List<String> sourceNames = Arrays.asList("ArXiv", "SwissBib", "Delicious", "LOCSH", "STW");
+	public static List<String> sourceNames = Arrays.asList("ArXiv", "SwissBib", "Delicious", "LOCSH", "STW", "Europeana");
 
 	public static boolean isSourceOfSourceKind(AbstractSource source, AbstractSource.SourceType type) {
 		switch (type) {

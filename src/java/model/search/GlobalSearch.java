@@ -29,39 +29,73 @@ public class GlobalSearch extends AbstractSearch {
 	@Override
 	protected void executeSearch() {
 
-		// Get the sources in the universe
+		// Get all sources in the universe
 		SearchEntity search = getSearchEntity();
 		List<SourceInstanceEntity> sourceInstances = sourceInstanceFacadeREST.findAllInUniverse(search.getUniverse().getId());
 
-		ArrayList<AbstractSource> sources = new ArrayList<AbstractSource>();
+		// Build a list of the thesaurus sources
+		ArrayList<AbstractSource> thesaurusSources = new ArrayList<AbstractSource>();
+		for (SourceInstanceEntity sourceInstance : sourceInstances) {
+			if (sourceInstance.getType().equals(AbstractSource.SourceType.THESAURUS)) {
+				AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
+
+				// Check that the source does implements the type indeed
+				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.THESAURUS)) {
+					thesaurusSources.add(source);
+				}
+			}
+		}
+
+		StringBuilder thesaurySourceListBuilder = new StringBuilder();
+		thesaurySourceListBuilder.append(thesaurusSources.get(0).getXxlCodeName());
+		for (int i = 1; i < thesaurusSources.size(); i++) {
+			thesaurySourceListBuilder.append(",");
+			thesaurySourceListBuilder.append(thesaurusSources.get(i).getXxlCodeName());
+		}
+
+		// Build a list of the document sources
+		ArrayList<AbstractSource> documentSources = new ArrayList<AbstractSource>();
 		for (SourceInstanceEntity sourceInstance : sourceInstances) {
 			if (sourceInstance.getType().equals(AbstractSource.SourceType.DOCUMENT)) {
 				AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
 
 				// Check that the source does implements the type indeed
 				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.DOCUMENT)) {
-					sources.add(source);
+					documentSources.add(source);
 				}
 			}
 		}
 
-		// Build the parameters for the call
-		StringBuilder sourceListBuilder = new StringBuilder();
-		sourceListBuilder.append(sources.get(0).getXxlCodeName());
-		for (int i = 1; i < sources.size(); i++) {
-			sourceListBuilder.append(",");
-			sourceListBuilder.append(sources.get(i).getXxlCodeName());
+		StringBuilder documentSourceListBuilder = new StringBuilder();
+		documentSourceListBuilder.append(documentSources.get(0).getXxlCodeName());
+		for (int i = 1; i < documentSources.size(); i++) {
+			documentSourceListBuilder.append(",");
+			documentSourceListBuilder.append(documentSources.get(i).getXxlCodeName());
 		}
 
-		Form params = new Form();
-		params.add("query", getSearchEntity().getQuery());
-		params.add("widgets", sourceListBuilder.toString());
-		params.add("userid", "11");
-		params.add("k", "0");
-		params.add("m", "10");
+		// Build a list of the LOD sources
+		ArrayList<AbstractSource> lodSources = new ArrayList<AbstractSource>();
+		for (SourceInstanceEntity sourceInstance : sourceInstances) {
+			if (sourceInstance.getType().equals(AbstractSource.SourceType.LOD)) {
+				AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
+
+				// Check that the source does implements the type indeed
+				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.LOD)) {
+					lodSources.add(source);
+				}
+			}
+		}
+
+		StringBuilder lodSourceListBuilder = new StringBuilder();
+		lodSourceListBuilder.append(lodSources.get(0).getXxlCodeName());
+		for (int i = 1; i < lodSources.size(); i++) {
+			lodSourceListBuilder.append(",");
+			lodSourceListBuilder.append(lodSources.get(i).getXxlCodeName());
+		}
 
 		// Build the hash for the cache
-		String toHash = params.getFirst("query") + params.getFirst("widgets");
+		String toHash = getSearchEntity().getQuery() + documentSourceListBuilder.toString()
+				+ thesaurySourceListBuilder.toString() + lodSourceListBuilder.toString();
 		cacheHash = computeCacheHash(SearchEntity.SearchType.GLOBAL, toHash);
 
 		// Look for a search with same cache hash
@@ -73,27 +107,58 @@ public class GlobalSearch extends AbstractSearch {
 			referenceId = new Long(-1);
 
 			try {
-				URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
-				ClientConfig config = new DefaultClientConfig();
-				Client client = Client.create(config);
+				// Create the parameters for the search call
+				Form widgetSearchParams = new Form();
+				widgetSearchParams.add("query", getSearchEntity().getQuery());
+				widgetSearchParams.add("widgets", documentSourceListBuilder.toString());
+				widgetSearchParams.add("userid", "11");
+				widgetSearchParams.add("m", "30");
 
-				WebResource resource = client.resource(rodinBaseUrl);
-				resource = resource.path("search.php");
-				resource = resource.queryParams(params);
-				resource.accept(MediaType.APPLICATION_JSON);
+				URI widgetSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
+				ClientConfig widgetSearchConfig = new DefaultClientConfig();
+				Client widgetSearchClient = Client.create(widgetSearchConfig);
 
-				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "XXL-URL: " + resource.getURI());
+				WebResource widgetSearchResource = widgetSearchClient.resource(widgetSearchBaseUrl);
+				widgetSearchResource = widgetSearchResource.path("search.php");
+				widgetSearchResource = widgetSearchResource.queryParams(widgetSearchParams);
+				widgetSearchResource.accept(MediaType.APPLICATION_JSON);
 
-				URI cacheBaseUrl = UriBuilder.fromUri("http://localhost/rodin-mobile/rodin-search-2.txt").build();
-				WebResource cacheResource = client.resource(cacheBaseUrl);
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL: " + widgetSearchResource.getURI());
 
-				String response = resource.get(String.class);
-				JSONObject responseObject = new JSONObject(response);
+				String widgetResponse = widgetSearchResource.get(String.class);
+				JSONObject widgetResponseObject = new JSONObject(widgetResponse);
 
-				JSONArray allResults = responseObject.getJSONArray("results");
+				String widgetSearchId = widgetResponseObject.getString("sid");
+
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL-SID: " + widgetSearchId);
+
+				// Create the parameters for the search call
+				Form lodParams = new Form();
+				lodParams.add("sid", widgetSearchId);
+				lodParams.add("thesauries", thesaurySourceListBuilder.toString());
+				lodParams.add("lodsources", lodSourceListBuilder.toString());
+				lodParams.add("lodsearch", 0);
+				lodParams.add("userid", "11");
+				lodParams.add("m", "30");
+
+				URI lodExpansionSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
+				ClientConfig lodConfig = new DefaultClientConfig();
+				Client lodClient = Client.create(lodConfig);
+
+				WebResource lodExpansionResource = lodClient.resource(lodExpansionSearchBaseUrl);
+				lodExpansionResource = lodExpansionResource.path("rdflodexpand.php");
+				lodExpansionResource = lodExpansionResource.queryParams(lodParams);
+				lodExpansionResource.accept(MediaType.APPLICATION_JSON);
+
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "LE-URL: " + lodExpansionResource.getURI());
+
+				String lodExpansionResponse = lodExpansionResource.get(String.class);
+				JSONObject lodExpansionResponseObject = new JSONObject(lodExpansionResponse);
+
+				JSONArray allResults = lodExpansionResponseObject.getJSONArray("results");
 
 				for (int i = 0; i < allResults.length(); i++) {
-					String detailString = cleanString(allResults.getJSONObject(i).getString("toDetails"));
+					String detailString = allResults.getJSONObject(i).getString("toDetails");
 
 					JSONObject details = new JSONObject(detailString);
 
@@ -120,8 +185,8 @@ public class GlobalSearch extends AbstractSearch {
 
 					result.setContent(details.getString("abstract"));
 
-					if (result.getContent().length() > 200) {
-						result.setSummary(result.getContent().trim().substring(0, 200) + " ... ");
+					if (result.getContent().length() > 128) {
+						result.setSummary(result.getContent().trim().substring(0, 128) + " ... ");
 					} else {
 						result.setSummary(result.getContent());
 					}

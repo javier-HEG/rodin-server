@@ -99,7 +99,7 @@ public abstract class AbstractSearch {
 	}
 
 	protected Date parseDate(String dateString) {
-		String[] formatStrings = {"dd.MM.yyyy", "yyyy-MM-dd'T'HH:mm:ss'Z'"};
+		String[] formatStrings = {"dd.MM.yyyy", "yyyy-MM-dd'T'HH:mm:ss'Z'", "EEE, dd MMM yyyy HH:mm:ss Z"};
 
 		for (String formatString : formatStrings) {
 			try {

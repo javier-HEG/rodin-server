@@ -18,6 +18,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import model.search.sources.AbstractSource;
+import model.search.sources.AbstractSource.SourceType;
+import model.search.sources.SourceInstanceEntity;
+import model.search.sources.SourceManager;
 import model.user.UniverseEntity;
 import model.user.UserEntity;
 
@@ -42,9 +46,26 @@ public class UniverseFacadeREST extends AbstractFacade<UniverseEntity> {
 		super.create(entity);
 
 		// Set the most recent universe as the last universe used
+		// TODO Why is this not simply "entity.getOwner()"?
 		UserEntity owner = em.find(UserEntity.class, entity.getOwner().getUsername());
 		owner.setUniverseid(entity.getId());
 		getEntityManager().merge(owner);
+
+		// Create source instances for all sources (default action)
+		List<AbstractSource> sources = SourceManager.getSourcesForUser(owner).getSources();
+		for (AbstractSource source : sources) {
+			String sourceName = source.getName();
+			for (SourceType type : AbstractSource.SourceType.values()) {
+				if (SourceManager.isSourceOfSourceKind(source, type)) {
+					SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
+					sourceInstance.setType(type);
+					sourceInstance.setUniverse(entity);
+					sourceInstance.setSourceName(sourceName);
+
+					em.persist(sourceInstance);
+				}
+			}
+		}
 
 		URI uri = uriInfo.getAbsolutePathBuilder().path(entity.getId().toString()).build();
 		return Response.created(uri).build();

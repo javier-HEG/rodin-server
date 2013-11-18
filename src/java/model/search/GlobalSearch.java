@@ -35,10 +35,13 @@ public class GlobalSearch extends AbstractSearch {
 
 		ArrayList<AbstractSource> sources = new ArrayList<AbstractSource>();
 		for (SourceInstanceEntity sourceInstance : sourceInstances) {
-			AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
+			if (sourceInstance.getType().equals(AbstractSource.SourceType.DOCUMENT)) {
+				AbstractSource source = (AbstractSource) SourceManager.getSourceByName(sourceInstance.getSourceName());
 
-			if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.DOCUMENT)) {
-				sources.add(source);
+				// Check that the source does implements the type indeed
+				if (SourceManager.isSourceOfSourceKind(source, AbstractSource.SourceType.DOCUMENT)) {
+					sources.add(source);
+				}
 			}
 		}
 
@@ -107,7 +110,7 @@ public class GlobalSearch extends AbstractSearch {
 						result.setType(ResultEntity.ResultType.BASIC);
 					}
 
-					result.setTitle(details.getString("title"));
+					result.setTitle(details.getString("title").trim());
 
 					if (!details.getString("authors").equals("")) {
 						for (String author : details.getString("authors").split(", ")) {
@@ -118,7 +121,7 @@ public class GlobalSearch extends AbstractSearch {
 					result.setContent(details.getString("abstract"));
 
 					if (result.getContent().length() > 200) {
-						result.setSummary(result.getContent().substring(0, 200) + " ... ");
+						result.setSummary(result.getContent().trim().substring(0, 200) + " ... ");
 					} else {
 						result.setSummary(result.getContent());
 					}

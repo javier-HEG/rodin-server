@@ -32,6 +32,7 @@ public class ResultEntity implements Serializable {
 	@ManyToOne
 	private SearchEntity search;
 	private ResultType type = ResultType.BASIC;
+	@Column(columnDefinition = "TINYBLOB")
 	private String title;
 	private List<String> authors;
 	@Temporal(javax.persistence.TemporalType.DATE)

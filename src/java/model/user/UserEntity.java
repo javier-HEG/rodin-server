@@ -1,6 +1,7 @@
 package model.user;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class UserEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private String username;
 	private String password;
+	@Column(columnDefinition = "TINYBLOB")
 	private String name;
 	@ManyToOne
 	private UserGroupEntity usergroup;

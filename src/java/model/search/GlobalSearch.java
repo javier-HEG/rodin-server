@@ -138,6 +138,7 @@ public class GlobalSearch extends AbstractSearch {
 				lodParams.add("thesauries", thesaurySourceListBuilder.toString());
 				lodParams.add("lodsources", lodSourceListBuilder.toString());
 				lodParams.add("lodsearch", 0);
+				lodParams.add("plainjson", 1);
 				lodParams.add("userid", "11");
 				lodParams.add("m", "30");
 
@@ -195,6 +196,17 @@ public class GlobalSearch extends AbstractSearch {
 
 					SourceDocumentEntity document = new SourceDocumentEntity();
 					document.setSourceLinkURL(details.getString("url"));
+
+					// Try to guess the source name from the URL
+					String sourceLinkURL = details.getString("url");
+					if (sourceLinkURL.indexOf("arxiv.org") > 0) {
+						document.setSourceName("Arxiv");
+					} else if (sourceLinkURL.indexOf("swissbib.ch") > 0) {
+						document.setSourceName("SwissBib");
+					} else if (sourceLinkURL.indexOf("delicious.com") > 0) {
+						document.setSourceName("Delicious");
+					}
+
 					documentFacadeREST.create(document);
 
 					Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, result.getTitle());

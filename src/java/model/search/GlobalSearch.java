@@ -106,13 +106,18 @@ public class GlobalSearch extends AbstractSearch {
 		} else {
 			referenceId = new Long(-1);
 
+			// Compute number of results to get
+			int maxPerWiget = 10;
+			int maxTotal = maxPerWiget * documentSources.size();
+
 			try {
 				// Create the parameters for the search call
 				Form widgetSearchParams = new Form();
 				widgetSearchParams.add("query", getSearchEntity().getQuery());
 				widgetSearchParams.add("widgets", documentSourceListBuilder.toString());
 				widgetSearchParams.add("userid", "11");
-				widgetSearchParams.add("m", "30");
+				widgetSearchParams.add("wm", String.valueOf(maxPerWiget));
+				widgetSearchParams.add("m", String.valueOf(maxTotal));
 
 				URI widgetSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
 				ClientConfig widgetSearchConfig = new DefaultClientConfig();
@@ -140,7 +145,7 @@ public class GlobalSearch extends AbstractSearch {
 				lodParams.add("lodsearch", 0);
 				lodParams.add("plainjson", 1);
 				lodParams.add("userid", "11");
-				lodParams.add("m", "30");
+				lodParams.add("m", String.valueOf(maxTotal));
 
 				URI lodExpansionSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
 				ClientConfig lodConfig = new DefaultClientConfig();

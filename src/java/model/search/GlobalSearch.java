@@ -164,8 +164,9 @@ public class GlobalSearch extends AbstractSearch {
 				JSONArray allResults = lodExpansionResponseObject.getJSONArray("results");
 
 				for (int i = 0; i < allResults.length(); i++) {
-					String detailString = allResults.getJSONObject(i).getString("toDetails");
+					JSONObject jsonResult = allResults.getJSONObject(i);
 
+					String detailString = jsonResult.getString("toDetails");
 					JSONObject details = new JSONObject(detailString);
 
 					ResultEntity result = new ResultEntity();
@@ -201,6 +202,8 @@ public class GlobalSearch extends AbstractSearch {
 
 					SourceDocumentEntity document = new SourceDocumentEntity();
 					document.setSourceLinkURL(details.getString("url"));
+
+					result.setScore(jsonResult.getDouble("rank"));
 
 					// Try to guess the source name from the URL
 					String sourceLinkURL = details.getString("url");

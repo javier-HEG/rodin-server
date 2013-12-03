@@ -47,12 +47,12 @@ public class ResultFacadeREST extends AbstractFacade<ResultEntity> {
 			// Get referenced search
 			SearchEntity referencedSearch = em.find(SearchEntity.class, search.getReferenceId());
 
-			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity");
+			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity order by r.score desc");
 			query.setParameter("searchEntity", referencedSearch);
 
 			return query.getResultList();
 		} else {
-			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity");
+			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity order by r.score desc");
 			query.setParameter("searchEntity", search);
 
 			return query.getResultList();

@@ -38,6 +38,7 @@ public class ResultEntity implements Serializable {
 	@Temporal(javax.persistence.TemporalType.DATE)
 	@Column(name = "PUBDATE")
 	private Date pubDate;
+	private Double score = 0.0;
 	// Fields proper to Articles
 	@Column(columnDefinition = "TINYBLOB")
 	private String summary;
@@ -97,6 +98,14 @@ public class ResultEntity implements Serializable {
 
 	public void setPubDate(Date pubDate) {
 		this.pubDate = pubDate;
+	}
+
+	public Double getScore() {
+		return score;
+	}
+
+	public void setScore(Double score) {
+		this.score = score;
 	}
 
 	public String getSummary() {

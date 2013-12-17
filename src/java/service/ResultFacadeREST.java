@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -40,7 +41,7 @@ public class ResultFacadeREST extends AbstractFacade<ResultEntity> {
 	@GET
 	@Path("/query")
 	@Produces({"application/xml", "application/json"})
-	public List<ResultEntity> findForSearch(@QueryParam("searchId") Long searchId) {
+	public List<ResultEntity> findForSearch(@QueryParam("searchId") Long searchId, @QueryParam("from") @DefaultValue("-1") int fromParam, @QueryParam("count") @DefaultValue("0") int countParam) {
 		SearchEntity search = em.find(SearchEntity.class, searchId);
 
 		if (search.getReferenceId().compareTo(new Long(-1)) != 0) {
@@ -50,10 +51,20 @@ public class ResultFacadeREST extends AbstractFacade<ResultEntity> {
 			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity order by r.score desc");
 			query.setParameter("searchEntity", referencedSearch);
 
+			if (fromParam >= 0) {
+				query.setMaxResults(countParam);
+				query.setFirstResult(fromParam);
+			}
+
 			return query.getResultList();
 		} else {
 			Query query = em.createQuery("select r from ResultEntity r where r.search=:searchEntity order by r.score desc");
 			query.setParameter("searchEntity", search);
+
+			if (fromParam >= 0) {
+				query.setMaxResults(countParam);
+				query.setFirstResult(fromParam);
+			}
 
 			return query.getResultList();
 		}

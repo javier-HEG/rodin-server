@@ -7,11 +7,13 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import model.results.ResultEntity;
 import service.DocumentFacadeREST;
 import service.ResultFacadeREST;
 import service.SearchFacadeREST;
@@ -59,6 +61,15 @@ public abstract class AbstractSearch {
 
 	protected void setStatus(SearchStatus newStatus) {
 		SearchEntity entity = searchFacadeREST.find(entityId);
+
+		if (newStatus.equals(SearchStatus.DONE)) {
+			// Set result count
+			ResultFacadeREST resultFacade = lookupResultFacadeRESTBean();
+			List<ResultEntity> allResults = resultFacade.findForSearch(entityId, -1, -1);
+
+			entity.setResultCount(allResults.size());
+		}
+
 		entity.setStatus(newStatus);
 		entity.setLastUpdated(new Timestamp(new Date().getTime()));
 
@@ -74,18 +85,18 @@ public abstract class AbstractSearch {
 	}
 
 	protected String computeCacheHash(SearchEntity.SearchType type, String toHash) {
-		String cacheHash = "";
+		String cacheHashLocal = "";
 
 		try {
 			String message = type + toHash;
 			MessageDigest m = MessageDigest.getInstance("MD5");
 			m.update(message.getBytes(), 0, message.length());
-			cacheHash = new BigInteger(1, m.digest()).toString(16);
+			cacheHashLocal = new BigInteger(1, m.digest()).toString(16);
 		} catch (NoSuchAlgorithmException ex) {
 			Logger.getLogger(AbstractSearch.class.getName()).log(Level.SEVERE, null, ex);
 		}
 
-		return cacheHash;
+		return cacheHashLocal;
 	}
 
 	protected String cleanString(String input) {

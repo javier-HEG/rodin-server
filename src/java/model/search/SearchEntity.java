@@ -33,6 +33,7 @@ public class SearchEntity implements Serializable {
 	private String query;
 	private SearchType type;
 	private SearchStatus status;
+	private int resultCount = 0;
 	private Timestamp lastUpdated;
 	@ManyToOne
 	private UniverseEntity universe;
@@ -93,6 +94,14 @@ public class SearchEntity implements Serializable {
 
 	public void setStatus(SearchStatus status) {
 		this.status = status;
+	}
+
+	public int getResultCount() {
+		return resultCount;
+	}
+
+	public void setResultCount(int resultCount) {
+		this.resultCount = resultCount;
 	}
 
 	public SourceInstanceEntity getSource() {

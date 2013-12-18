@@ -128,14 +128,14 @@ public class GlobalSearch extends AbstractSearch {
 				widgetSearchResource = widgetSearchResource.queryParams(widgetSearchParams);
 				widgetSearchResource.accept(MediaType.APPLICATION_JSON);
 
-				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL: " + widgetSearchResource.getURI());
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL: {0}", widgetSearchResource.getURI());
 
 				String widgetResponse = widgetSearchResource.get(String.class);
 				JSONObject widgetResponseObject = new JSONObject(widgetResponse);
 
 				String widgetSearchId = widgetResponseObject.getString("sid");
 
-				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL-SID: " + widgetSearchId);
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "WS-URL-SID: {0}", widgetSearchId);
 
 				// Create the parameters for the search call
 				Form lodParams = new Form();
@@ -156,7 +156,7 @@ public class GlobalSearch extends AbstractSearch {
 				lodExpansionResource = lodExpansionResource.queryParams(lodParams);
 				lodExpansionResource.accept(MediaType.APPLICATION_JSON);
 
-				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "LE-URL: " + lodExpansionResource.getURI());
+				Logger.getLogger(GlobalSearch.class.getName()).log(Level.OFF, "LE-URL: {0}", lodExpansionResource.getURI());
 
 				String lodExpansionResponse = lodExpansionResource.get(String.class);
 				JSONObject lodExpansionResponseObject = new JSONObject(lodExpansionResponse);

@@ -54,31 +54,58 @@ public class TestFacadeREST {
 
 			em.persist(user);
 
+			// Create René's user
+			UserEntity rene = new UserEntity();
+			rene.setUsername("rene");
+			rene.setName("René");
+			rene.setPassword("testrene");
+			rene.setUsergroup(userGroupEntity);
+
+			em.persist(rene);
+
+			// Create Fabio's user
+			UserEntity fabio = new UserEntity();
+			fabio.setUsername("fabio");
+			fabio.setName("Fabio");
+			fabio.setPassword("testfabio");
+			fabio.setUsergroup(userGroupEntity);
+
+			em.persist(fabio);
+
+			// Create Eliane's user
+			UserEntity eliane = new UserEntity();
+			eliane.setUsername("eliane");
+			eliane.setName("Eliane");
+			eliane.setPassword("testeliane");
+			eliane.setUsergroup(userGroupEntity);
+
+			em.persist(eliane);
+
 			// Create universe
-			UniverseEntity universe = new UniverseEntity();
-			universe.setName("Test universe");
-			universe.setOwner(user);
-
-			em.persist(universe);
+//			UniverseEntity universe = new UniverseEntity();
+//			universe.setName("Test universe");
+//			universe.setOwner(user);
+//
+//			em.persist(universe);
 
 			// Create universe
-			UniverseEntity anotherUniverse = new UniverseEntity();
-			anotherUniverse.setName("Another universe");
-			anotherUniverse.setOwner(user);
+//			UniverseEntity anotherUniverse = new UniverseEntity();
+//			anotherUniverse.setName("Another universe");
+//			anotherUniverse.setOwner(user);
 
-			em.persist(anotherUniverse);
+//			em.persist(anotherUniverse);
 
 			// Attribute universe to user
-			user.setUniverseid(universe.getId());
-			em.merge(user);
+//			user.setUniverseid(universe.getId());
+//			em.merge(user);
 
 			// Create source instance in test universe
-			SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
-			sourceInstance.setSourceName("ArXiv");
-			sourceInstance.setType(AbstractSource.SourceType.DOCUMENT);
-			sourceInstance.setUniverse(universe);
-
-			em.persist(sourceInstance);
+//			SourceInstanceEntity sourceInstance = new SourceInstanceEntity();
+//			sourceInstance.setSourceName("ArXiv");
+//			sourceInstance.setType(AbstractSource.SourceType.DOCUMENT);
+//			sourceInstance.setUniverse(universe);
+//
+//			em.persist(sourceInstance);
 
 			return Response.ok("Test objects created").build();
 		} else {

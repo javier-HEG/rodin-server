@@ -70,4 +70,8 @@ public class SearchExecuter implements Runnable {
 
 		searchObject.execute();
 	}
+        
+        public void nada() {
+            
+        }
 }

@@ -119,7 +119,7 @@ public class GlobalSearch extends AbstractSearch {
 				widgetSearchParams.add("wm", String.valueOf(maxPerWiget));
 				widgetSearchParams.add("m", String.valueOf(maxTotal));
 
-				URI widgetSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
+				URI widgetSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
 				ClientConfig widgetSearchConfig = new DefaultClientConfig();
 				Client widgetSearchClient = Client.create(widgetSearchConfig);
 
@@ -147,7 +147,7 @@ public class GlobalSearch extends AbstractSearch {
 				lodParams.add("userid", "11");
 				lodParams.add("m", String.valueOf(maxTotal));
 
-				URI lodExpansionSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
+				URI lodExpansionSearchBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
 				ClientConfig lodConfig = new DefaultClientConfig();
 				Client lodClient = Client.create(lodConfig);
 

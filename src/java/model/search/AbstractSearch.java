@@ -129,7 +129,7 @@ public abstract class AbstractSearch {
 	private SearchFacadeREST lookupSearchFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();
-			return (SearchFacadeREST) c.lookup("java:global/RODIN_Server/SearchFacadeREST!service.SearchFacadeREST");
+			return (SearchFacadeREST) c.lookup("java:global/rodin-server/SearchFacadeREST!service.SearchFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);
@@ -139,7 +139,7 @@ public abstract class AbstractSearch {
 	private SourceInstanceFacadeREST lookupSourceInstanceFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();
-			return (SourceInstanceFacadeREST) c.lookup("java:global/RODIN_Server/SourceInstanceFacadeREST!service.SourceInstanceFacadeREST");
+			return (SourceInstanceFacadeREST) c.lookup("java:global/rodin-server/SourceInstanceFacadeREST!service.SourceInstanceFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);
@@ -149,7 +149,7 @@ public abstract class AbstractSearch {
 	private ResultFacadeREST lookupResultFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();
-			return (ResultFacadeREST) c.lookup("java:global/RODIN_Server/ResultFacadeREST!service.ResultFacadeREST");
+			return (ResultFacadeREST) c.lookup("java:global/rodin-server/ResultFacadeREST!service.ResultFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);
@@ -159,12 +159,10 @@ public abstract class AbstractSearch {
 	private DocumentFacadeREST lookupDocumentFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();
-			return (DocumentFacadeREST) c.lookup("java:global/RODIN_Server/DocumentFacadeREST!service.DocumentFacadeREST");
+			return (DocumentFacadeREST) c.lookup("java:global/rodin-server/DocumentFacadeREST!service.DocumentFacadeREST");
 		} catch (NamingException ne) {
 			Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
 			throw new RuntimeException(ne);
-
-
 		}
 	}
 

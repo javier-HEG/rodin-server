@@ -45,7 +45,7 @@ public class SearchExecuter implements Runnable {
 	private SearchFacadeREST lookupSearchFacadeRESTBean() {
 		try {
 			Context c = new InitialContext();
-			return (SearchFacadeREST) c.lookup("java:global/RODIN_Server/SearchFacadeREST!service.SearchFacadeREST");
+			return (SearchFacadeREST) c.lookup("java:global/rodin-server/SearchFacadeREST!service.SearchFacadeREST");
 		} catch (NamingException ne) {
 			throw new RuntimeException(ne);
 		}

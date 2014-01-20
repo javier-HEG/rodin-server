@@ -75,7 +75,7 @@ public class ThesaurusSearch extends AbstractSearch {
 			referenceId = new Long(-1);
 
 			try {
-				URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/eng/app/webs").build();
+				URI rodinBaseUrl = UriBuilder.fromUri("http://82.192.234.100:25834/-/rodin/xxl/app/webs").build();
 				ClientConfig config = new DefaultClientConfig();
 				Client client = Client.create(config);
 
